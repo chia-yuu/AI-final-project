@@ -1,3 +1,7 @@
+# Input movie name, output 5 recommended movies
+# User can watch multiple movies and recommend according to these movies
+# Use cosine similarity to calculate the similarity between movies
+# Randomness. If similarity are the same, then recommend the movie randomly, so it won't recommend the same movie every time by the movie ID.
 import dataset
 import heapq
 import math
@@ -5,27 +9,10 @@ import random
 
 def collaborative():
     # load data
-    rating = dataset.load_data()    # user id | movie id | rating | timestamp
     movies = dataset.load_movie()   # movie id | movie title | release date | video release date |IMDb URL | 類型(19項)
 
     user_movie = [0]*19     # record the overall type of the user's watched
     watched_history = []    # record the movies that user had watched, so we won't recommend the movie again
-
-    # construct user-movie matrix
-    '''
-    um_matrix is a 944 * 1683 matrix, record the rating of the movies by each user
-    um_matrix[user][movie] = [rating]
-    the mtx size is +1 because the movie id start from 1
-    '''
-    um_matrix = []
-    # initialize
-    for u in range(944):
-        um_matrix.append([])
-        for m in range(1683):
-            um_matrix[u].append(0)
-    # fill in value
-    for r in rating:
-        um_matrix[int(r[0])][int(r[1])] = int(r[2])
 
     # calculate similarity matrix (Cosine Similarity)
     '''
@@ -35,6 +22,7 @@ def collaborative():
     we calculate its movie type according to the user's watching history
     and construct the similarity between it and other movies (this part is done in the whiel loop)
     '''
+    print("collaborative preparing dataset")
     similarity_matrix = []
     for i in range(1683):
         similarity_matrix.append([])
@@ -78,7 +66,7 @@ def collaborative():
             else: similarity = a / (math.sqrt(b) * math.sqrt(c))
             similarity_matrix[1682][i] = similarity
 
-        # choose the top 10 similar movie
+        # choose the top 5 similar movie
         pq = []
         for i in range(1682):
             # to make it a max heap (large value at the front), let similarity * (-1)
@@ -87,16 +75,7 @@ def collaborative():
 
         # output
         print("You may like the following 5 movies:")
-        # no random
-        # for i in range(5):
-        #     similarity, id = heapq.heappop(pq)
-        #     if(id == watched_movie_id):
-        #         i -= 1
-        #         continue
-        #     name = dataset.find_movie_name(id+1)
-        #     # print(f"{name},     similarity = {similarity * (-1)}")
-        #     print("%60s || similarity = %.4f" %(name, similarity * (-1)))
-        
+
         # if movies have the same similarity, then output a random movie
         n_output = 5
         while(n_output>0):
@@ -125,3 +104,7 @@ def collaborative():
                     name = dataset.find_movie_name(id+1)
                     print("%60s || similarity = %.4f" %(name, similarity * (-1)))
                     n_output -= 1
+
+
+if __name__ == '__main__':
+    collaborative()
