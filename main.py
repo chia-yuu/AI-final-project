@@ -2,7 +2,7 @@ import content_based, svd, DQN
 def main():
     while(True):
         print("\t### MENU ###")
-        print("1. Collaborative filtering")
+        print("1. Content based")
         print("2. SVD")
         print("3. DQN")
         print("4. Exit")
