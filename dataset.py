@@ -118,3 +118,25 @@ def find_next_movie(user_id, movie_id):
         return int(like[random.randint(0,count-1)][1])
     
     return int(temp[nextindex][1])
+
+def find_rating(user_id,movie_id):
+    for index, information in enumerate(data):
+        if(int(information[0])==user_id and int(information[1])==movie_id):
+            return information[2]
+    return "none"
+
+def find_average_rating(user_id):
+    num = 0
+    sum = 0
+    
+    for index, information in enumerate(data):
+        if(int(information[0])==user_id):
+            num = num +1
+            sum = sum + int(information[2])
+            
+    return math.ceil(sum / num)
+
+def find_userinfo(user_id):
+    for index, information in enumerate(user):
+        if(int(information[0])==user_id):
+            return user[user_id-1]
