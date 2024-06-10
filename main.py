@@ -1,4 +1,4 @@
-import collaborative, svd, DQN
+import content_based, svd, DQN
 def main():
     while(True):
         print("\t### MENU ###")
@@ -7,7 +7,7 @@ def main():
         print("3. DQN")
         print("4. Exit")
         algo = int(input("Please enter the algorithm you like: "))
-        if(algo == 1): collaborative.collaborative()
+        if(algo == 1): content_based.content_based()
         elif(algo == 2): svd.svd_main()
         elif(algo == 3): DQN.DQN()
         elif(algo == 4): break
