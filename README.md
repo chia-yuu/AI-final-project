@@ -29,8 +29,8 @@ We use [MovieLens 100K](https://grouplens.org/datasets/movielens/100k/) dadaset.
 ## Usage
 1. Type `python main.py` to start the program.
 2. Choose the algorithm you want to use. 
->1. Content based
->2. Collaborative filtering
+>1. Collaborative filtering
+>2. SVD
 >3. DQN
 >4. Exit
 3. Enter your user ID (1-943) and a movie you like.
@@ -50,10 +50,40 @@ A 3-layer Neural Network. It can better capture the complex relationships betwee
 
 ## Hyperparameters
 ### Collaborative (SVD)
-**TODO**
+- learning rate (lr_all)
+    > When the range of learning rate become more precise, the rating would be higher.
+- number of factor (n_factors)
+    > When number of factors is increasing, the ratings are decreasing. 
 
 ### RL (DQN)
-**TODO**
+- learning rate (lr)
+- capacity
+- gamma
+- batch size
+- epsilon
 
 ## Experiment results
-**TODO**
+We use RMSE to evaluate the performance of content base and collaborative filtering.
+### Same input
+We enter the same input to both content based and collaborative filtering to get the recommendation for 1, 5, 10 times.<br>
+The input comes from user 256's watched movie.
+|recommend times|  content based  |  collaborative filtering  |
+|:-------------:|:---------------:|:-------------------------:|
+|       1       |8.261599924202647|    3.9288043553128413     |
+|       5       |9.487659487650069|    3.858081586068965      |
+|       10      |11.08391490881054|    3.913781415118725      |
+
+### Input according to the recommendation of content base
+We also try another input. In this senior, we enter the recommendation of content based.
+|recommend times|   content based  |  collaborative filtering |
+|:-------------:|:----------------:|:------------------------:|
+|       1       |2.013194072167833 |   3.857669464038458      |
+|       5       |1.4141995167287948|   3.7697541396635095     |
+|       10      |3.217187094744785 |   3.791153271628686      |
+
+
+### Which one is better?
+From the result above, we can see that in different senior, different algorithm will have different RMSE. It is because content based calculate similarity according to movie genre, but users may type in different kind of movie everytime. Therefore, in senior 2, the entered movies belong to the same genre, so it has a lower RMSE and is better than collaborative filtering.
+
+### Result of DQN
+We fail to implement our DQN. We can use it to get the recommended movie, and the recommendation seems to be reasonable, but as we plot the reward, it is clearly that we have a wrong result. Due to the time limitaion, we are not able to fix this problem.
