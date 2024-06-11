@@ -1,4 +1,5 @@
 import random
+import math
 
 data = []   # string
 item = []   # string
@@ -95,8 +96,8 @@ def find_movie_name(movie_id):
     return ""
 
 def find_next_movie(user_id, movie_id):
+
     temp = []
-    like = []
     time = 0
     for i in range(100000):
         if(user_id == int(data[i][0])): temp.append(data[i])
@@ -106,16 +107,13 @@ def find_next_movie(user_id, movie_id):
     flag = 0
     count = 0
     for index,array in enumerate(temp):
-        if(int(array[2])>=3):
-            like.append(array)
-            count = count + 1
-        if(int(array[3])>time and int(array[3])<nexttime and int(array[2])>= 3): 
+        if(int(array[3])>time and int(array[3])<nexttime): 
             flag = 1
             nexttime = int(array[3])
             nextindex = index
 
     if(flag == 0): 
-        return int(like[random.randint(0,count-1)][1])
+        return 1700
     
     return int(temp[nextindex][1])
 
