@@ -1,6 +1,5 @@
 import dataset
-import numpy
-import heapq
+import math
 import pandas as pd
 from surprise import Dataset
 from surprise import Reader
@@ -10,9 +9,10 @@ from surprise.model_selection import train_test_split
 from surprise.model_selection import cross_validate
 from surprise.model_selection import GridSearchCV
 
-def svd(data, uid, watched_history):
+def svd(data, uid, watched_history, avg_score):
     # choose best parameters: 
     # uses GridSearchCV to find the best parameters for the SVD model (number of epochs, learning rate, and number of factors).
+    print("--------Start Processing--------")
     param_grid = {"n_epochs": [5, 10], "lr_all": [0.002, 0.005], "n_factors": [50, 100,150]}
     gs = GridSearchCV(SVD, param_grid, measures=["rmse", "mae"], cv=3, joblib_verbose=1, n_jobs=2)
     gs.fit(data)
@@ -37,11 +37,20 @@ def svd(data, uid, watched_history):
     # choose the top 5 similar movie
     top_5_indices = sorted(range(len(score)), key=lambda i: (-score[i], i), reverse=True)[:5]
 
-    #Output
+    
+    sum = 0
+    # Output
+    print("You may like the following 5 movies: ")
     for i in top_5_indices:
         name = dataset.find_movie_name(i)
         est_score = score[i]
+        sum = (est_score - avg_score) * (est_score - avg_score) + sum
         print("%60s || Score = %.4f" %(name, est_score))
+    
+    # Calcute RMSE
+    print(f"\n\nRMSE = {math.sqrt(sum / 5)}\n\n")
+    rmse = math.sqrt(sum / 5)
+    return rmse
 
         
 def get_movie_genres(movie_id, movies):
@@ -87,11 +96,15 @@ def recommend_movies(movie_id, movies):
         i = i + 1
     return re_movie_id
 
-def svd_main():
+
+
+if __name__ == "__main__":
     # load data
     rating = dataset.load_data()    # user id | movie id | rating | timestamp
     movies = dataset.load_movie()   # movie id | movie title | release date | video release date |IMDb URL | 類型(19項)
     watched_history = []
+    rmse = []
+    testcase = 0
 
     # input 
     while(True):
@@ -102,6 +115,7 @@ def svd_main():
         watched_movie_id = dataset.find_movie_id(watched_movie_name)
         if(watched_movie_id==-1): continue
         watched_history.append(watched_movie_id)
+        testcase = testcase + 1
 
         # Choose movies that belong to the same genres  as given movie to traing svd.
         train_movie = recommend_movies(watched_movie_id + 1, movies)
@@ -127,7 +141,19 @@ def svd_main():
                                             'anime_id': [int(x[1]) for x in train_rating],
                                             'rating': [int(x[2]) for x in train_rating]}), 
                                     reader)
-        svd(data, user_id, watched_history)
+        
+        # Calculte the average rating the user has given
+        rating_sum = 0
+        n = 0
+        for i in rating:
+            if (int(i[0]) == user_id):
+                rating_sum = rating_sum + int(i[2])
+                n = n + 1
+        if(n == 0):
+            avg_rate = rating_sum / 1
+        else:
+            avg_rate = rating_sum / n
 
-if __name__ == "__main__":
-    svd_main()
+        rmse.append(svd(data, user_id, watched_history, avg_rate)) 
+    # Calculate average RMSE
+    print(f"\n\nAverage RMSE = {(sum(rmse) / testcase)}\n\n")
